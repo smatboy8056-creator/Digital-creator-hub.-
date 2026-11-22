@@ -1,0 +1,962 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="dark">
+<meta name="theme-color" content="#141922">
+<title>Welcome</title>
+
+<!--
+  ============================================================
+  HOW TO EDIT THIS PAGE LATER
+  ============================================================
+  1. Contact links are in the bottom section. Search for
+     "EDIT LINK" to jump to each one. Replace only the text
+     inside href="...". Keep the quotes.
+  2. To change any visible words or add a language,
+     search for "const TEXT" in the script at the bottom.
+  3. To change how many accounts one phone can hold,
+     search for "MAX_ACCOUNTS".
+  4. Save as index.html and upload to GitHub Pages.
+
+  ABOUT THE LOGIN
+  Accounts are saved inside the visitor's own browser only.
+  Passwords are scrambled (PBKDF2) and never leave the phone.
+  This is a friendly gate, not bank-level security.
+  ============================================================
+-->
+
+<style>
+  :root {
+    --bg: #141922;
+    --surface: #1c2330;
+    --surface-hover: #263044;
+    --border: #36425a;
+    --text: #eef2f8;
+    --muted: #b1bbca;
+    --accent: #8ecbff;
+    --on-accent: #0c1420;
+    --error: #ffb4b4;
+    --ok: #a8e6b8;
+  }
+
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+
+  body {
+    margin: 0;
+    min-height: 100vh;
+    background-color: var(--bg);
+    background-image: radial-gradient(60rem 28rem at 50% -8rem, #22334f 0%, rgba(20, 25, 34, 0) 70%);
+    background-repeat: no-repeat;
+    color: var(--text);
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto,
+      "Noto Sans", "Noto Sans Devanagari", "Noto Sans Gurmukhi",
+      "Noto Naskh Arabic", "Noto Nastaliq Urdu", sans-serif;
+    font-size: 1.125rem;
+    line-height: 1.6;
+  }
+  html[lang="ur"] body { line-height: 2; }
+
+  [hidden] { display: none !important; }
+
+  .wrap { max-width: 40rem; margin-inline: auto; padding: 1rem 1.25rem 3rem; }
+
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  :focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
+
+  button, .btn, input { font: inherit; }
+  button, .btn { cursor: pointer; transition: background-color 0.15s, border-color 0.15s, transform 0.1s; }
+  button:active, .btn:active { transform: scale(0.98); }
+
+  .topbar { display: flex; justify-content: flex-end; padding-block: 0.5rem 1.5rem; }
+
+  .lang-button {
+    min-height: 48px;
+    padding: 0.5rem 1.25rem;
+    background: var(--surface);
+    color: var(--text);
+    border: 2px solid var(--border);
+    border-radius: 999px;
+    font-weight: 600;
+  }
+  .lang-button:hover { background: var(--surface-hover); }
+
+  h1 {
+    font-size: clamp(2rem, 8vw, 2.75rem);
+    line-height: 1.15;
+    margin: 0 0 0.75rem;
+    letter-spacing: -0.01em;
+  }
+  html[lang="ur"] h1 { line-height: 1.7; }
+  h1:focus { outline: none; }
+  h1::after {
+    content: "";
+    display: block;
+    width: 3.5rem;
+    height: 5px;
+    margin-top: 0.75rem;
+    border-radius: 99px;
+    background: var(--accent);
+  }
+
+  h2 { font-size: 1.35rem; margin: 0 0 0.75rem; }
+
+  .kicker { margin: 0 0 0.5rem; color: var(--accent); font-weight: 700; font-size: 1.2rem; }
+
+  .intro { margin: 0 0 1.5rem; color: var(--muted); max-width: 32rem; }
+
+  section[data-view] { margin-bottom: 3rem; animation: rise 0.35s ease-out; }
+  @keyframes rise {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: none; }
+  }
+
+  .notice { margin: 0 0 1rem; color: var(--ok); }
+  .notice:focus { outline: none; }
+
+  /* ---------- Forms ---------- */
+  .gate-form {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 1.5rem 1.25rem;
+    margin-bottom: 1rem;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+  }
+  label { display: block; font-weight: 700; margin-bottom: 0.4rem; }
+  input[type="text"], input[type="password"] {
+    width: 100%;
+    min-height: 56px;
+    padding: 0.5rem 1rem;
+    margin-bottom: 1rem;
+    background: var(--bg);
+    color: var(--text);
+    border: 2px solid var(--border);
+    border-radius: 12px;
+  }
+  input[type="text"]:focus-visible, input[type="password"]:focus-visible {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 4px rgba(142, 203, 255, 0.25);
+  }
+
+  .check {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    min-height: 48px;
+    margin-bottom: 0.5rem;
+    font-weight: 400;
+    cursor: pointer;
+  }
+  .check input { width: 26px; height: 26px; margin: 0; accent-color: #8ecbff; flex: none; }
+
+  .error { min-height: 1.6em; margin: 0 0 0.75rem; color: var(--error); }
+
+  .primary {
+    width: 100%;
+    min-height: 56px;
+    background: var(--accent);
+    color: var(--on-accent);
+    border: 2px solid var(--accent);
+    border-radius: 14px;
+    font-weight: 700;
+  }
+  .primary:hover { background: #b4dcff; border-color: #b4dcff; }
+
+  .actions { display: grid; gap: 0.75rem; }
+
+  .text-button {
+    width: 100%;
+    min-height: 52px;
+    padding: 0.5rem 1rem;
+    background: transparent;
+    color: var(--text);
+    border: 2px solid var(--border);
+    border-radius: 12px;
+    font-weight: 600;
+  }
+  .text-button:hover { background: var(--surface-hover); }
+
+  .code {
+    margin: 0 0 1rem;
+    padding: 1.1rem 1rem;
+    background: var(--surface);
+    border: 2px solid var(--accent);
+    border-radius: 14px;
+    font-size: 1.6rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-align: center;
+    direction: ltr;
+    overflow-wrap: anywhere;
+  }
+
+  /* ---------- Contact section (bottom) ---------- */
+  .contact { border-top: 1px solid var(--border); padding-top: 2rem; }
+  .contact p { margin: 0 0 1.25rem; color: var(--muted); }
+
+  .contact-buttons { display: flex; flex-direction: column; gap: 0.75rem; }
+
+  .btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 56px;
+    padding: 0.75rem 1.25rem;
+    background: var(--accent);
+    color: var(--on-accent);
+    text-decoration: none;
+    font-weight: 700;
+    border-radius: 14px;
+    border: 2px solid var(--accent);
+    text-align: center;
+  }
+  .btn:hover { background: #b4dcff; border-color: #b4dcff; }
+  .btn-channel { background: #5fe08b; border-color: #5fe08b; }
+  .btn-channel:hover { background: #86ebab; border-color: #86ebab; }
+  .btn-youtube { background: #ff8a8a; border-color: #ff8a8a; }
+  .btn-youtube:hover { background: #ffadad; border-color: #ffadad; }
+
+  @media (min-width: 38rem) {
+    .contact-buttons { flex-direction: row; }
+    .btn { flex: 1; }
+  }
+
+  /* ---------- Language popup ---------- */
+  dialog {
+    width: min(92vw, 26rem);
+    padding: 1.5rem;
+    background: var(--surface);
+    color: var(--text);
+    border: 2px solid var(--border);
+    border-radius: 18px;
+    font: inherit;
+  }
+  dialog::backdrop { background: rgba(5, 8, 14, 0.8); }
+  dialog h2 { margin-top: 0; }
+
+  .lang-list { list-style: none; margin: 0 0 1.25rem; padding: 0; display: grid; gap: 0.6rem; }
+  .lang-option {
+    width: 100%;
+    min-height: 56px;
+    padding: 0.6rem 1rem;
+    background: var(--bg);
+    color: var(--text);
+    border: 2px solid var(--border);
+    border-radius: 12px;
+    font-size: 1.15rem;
+    font-weight: 600;
+    text-align: start;
+  }
+  .lang-option:hover { background: var(--surface-hover); }
+  .lang-option[aria-pressed="true"] { border-color: var(--accent); background: #1f3550; }
+
+  .close-button {
+    width: 100%;
+    min-height: 52px;
+    background: transparent;
+    color: var(--text);
+    border: 2px solid var(--border);
+    border-radius: 12px;
+    font-weight: 600;
+  }
+  .close-button:hover { background: var(--surface-hover); }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { transition: none !important; animation: none !important; }
+  }
+</style>
+</head>
+
+<body>
+<div class="wrap">
+
+  <!-- Top bar: language button -->
+  <header class="topbar">
+    <button type="button" id="langBtn" class="lang-button"
+            aria-haspopup="dialog" data-i18n="langButton">Change language</button>
+  </header>
+
+  <main id="main">
+
+    <noscript><p class="intro">Please turn on JavaScript to use this page.</p></noscript>
+
+    <!-- VIEW 1: Sign in -->
+    <section id="viewSignIn" data-view hidden aria-labelledby="signInTitle">
+      <p id="guestSignIn" class="kicker"></p>
+      <h1 id="signInTitle" tabindex="-1" data-i18n="signInTitle">Sign in</h1>
+      <p class="intro" data-i18n="signInText">Enter your name and password.</p>
+      <p id="signInNotice" class="notice" role="status" tabindex="-1"></p>
+      <form id="signInForm" class="gate-form" novalidate>
+        <label for="siName" data-i18n="nameLabel">Your name</label>
+        <input type="text" id="siName" autocomplete="username" maxlength="40">
+        <label for="siPass" data-i18n="passwordLabel">Password</label>
+        <input type="password" id="siPass" autocomplete="current-password">
+        <label class="check"><input type="checkbox" data-toggle="siPass"><span data-i18n="showPassword">Show password</span></label>
+        <p id="siError" class="error" role="alert"></p>
+        <button type="submit" class="primary" data-i18n="signInBtn">Sign in</button>
+      </form>
+      <div class="actions">
+        <button type="button" id="goCreate" class="text-button" data-i18n="goCreate">Create new account</button>
+        <p id="fullNote" class="intro" hidden data-i18n="errFull">This phone already has two accounts.</p>
+        <button type="button" id="goForgot" class="text-button" data-i18n="goForgot">Forgot password?</button>
+      </div>
+    </section>
+
+    <!-- VIEW 2: Create account -->
+    <section id="viewCreate" data-view hidden aria-labelledby="createTitle">
+      <p id="guestCreate" class="kicker"></p>
+      <h1 id="createTitle" tabindex="-1" data-i18n="createTitle">Create account</h1>
+      <p class="intro" data-i18n="createText">Choose a name and a password. Accounts are saved on this phone only, and a phone can hold two.</p>
+      <form id="createForm" class="gate-form" novalidate>
+        <label for="crName" data-i18n="nameLabel">Your name</label>
+        <input type="text" id="crName" autocomplete="username" maxlength="40">
+        <label for="crPass" data-i18n="passwordLabel">Password</label>
+        <input type="password" id="crPass" autocomplete="new-password">
+        <label for="crPass2" data-i18n="confirmLabel">Repeat password</label>
+        <input type="password" id="crPass2" autocomplete="new-password">
+        <label class="check"><input type="checkbox" data-toggle="crPass,crPass2"><span data-i18n="showPassword">Show password</span></label>
+        <p id="crError" class="error" role="alert"></p>
+        <button type="submit" class="primary" data-i18n="createBtn">Create account</button>
+      </form>
+      <div class="actions">
+        <button type="button" id="backFromCreate" class="text-button" data-i18n="backToSignIn">Back to sign in</button>
+      </div>
+    </section>
+
+    <!-- VIEW 3: Recovery code, shown once after creating an account -->
+    <section id="viewCode" data-view hidden aria-labelledby="codeTitle">
+      <h1 id="codeTitle" tabindex="-1" data-i18n="codeTitle">Your recovery code</h1>
+      <p class="intro" data-i18n="codeText">Write this code somewhere safe. You need it if you forget your password. It will not be shown again.</p>
+      <p id="codeValue" class="code" lang="en" dir="ltr"></p>
+      <div class="actions">
+        <button type="button" id="copyCode" class="text-button" data-i18n="codeCopy">Copy code</button>
+        <button type="button" id="codeSaved" class="primary" data-i18n="codeSaved">I saved my code, continue</button>
+      </div>
+    </section>
+
+    <!-- VIEW 4: Forgot password -->
+    <section id="viewForgot" data-view hidden aria-labelledby="forgotTitle">
+      <h1 id="forgotTitle" tabindex="-1" data-i18n="forgotTitle">Reset password</h1>
+      <p class="intro" data-i18n="forgotText">Enter your name, your recovery code and a new password.</p>
+      <form id="forgotForm" class="gate-form" novalidate>
+        <label for="fgName" data-i18n="nameLabel">Your name</label>
+        <input type="text" id="fgName" autocomplete="username" maxlength="40">
+        <label for="fgCode" data-i18n="codeLabel">Recovery code</label>
+        <input type="text" id="fgCode" autocomplete="off" autocapitalize="characters" maxlength="20" dir="ltr">
+        <label for="fgPass" data-i18n="newPasswordLabel">New password</label>
+        <input type="password" id="fgPass" autocomplete="new-password">
+        <label class="check"><input type="checkbox" data-toggle="fgPass"><span data-i18n="showPassword">Show password</span></label>
+        <p id="fgError" class="error" role="alert"></p>
+        <button type="submit" class="primary" data-i18n="resetBtn">Reset password</button>
+      </form>
+      <div class="actions">
+        <button type="button" id="backFromForgot" class="text-button" data-i18n="backToSignIn">Back to sign in</button>
+      </div>
+    </section>
+
+    <!-- VIEW 5: Home, shown after sign in -->
+    <section id="viewHome" data-view hidden aria-labelledby="homeTitle">
+      <h1 id="homeTitle" tabindex="-1"></h1>
+      <p class="intro" data-i18n="homeText">Welcome! New videos, apps and games are coming soon. Follow the channels below to hear first.</p>
+      <div class="actions">
+        <button type="button" id="logout" class="text-button" data-i18n="logout">Sign out</button>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Bottom contact section: WhatsApp Channel, YouTube, WhatsApp chat -->
+  <footer class="contact" aria-labelledby="contactHeading">
+    <h2 id="contactHeading" data-i18n="contactHeading">Contact and updates</h2>
+    <p data-i18n="contactText">Get new uploads first, or message directly.</p>
+
+    <div class="contact-buttons">
+
+      <!-- EDIT LINK: WhatsApp Channel -->
+      <a class="btn btn-channel" href="https://whatsapp.com/channel/0029Vb7eoyHH5JM8OVLZFN2G"
+         target="_blank" rel="noopener noreferrer">
+        <span data-i18n="whatsappChannel">WhatsApp Channel</span>
+        <span class="sr-only" data-i18n="newTab">opens in a new tab</span>
+      </a>
+
+      <!-- EDIT LINK: YouTube Channel -->
+      <a class="btn btn-youtube" href="https://www.youtube.com/@blind_gaming_world"
+         target="_blank" rel="noopener noreferrer">
+        <span data-i18n="youtube">YouTube Channel</span>
+        <span class="sr-only" data-i18n="newTab">opens in a new tab</span>
+      </a>
+
+      <!-- EDIT LINK: WhatsApp direct chat (country code + number, digits only) -->
+      <a class="btn" href="https://wa.me/919587800156"
+         target="_blank" rel="noopener noreferrer">
+        <span data-i18n="whatsappChat">Chat on WhatsApp</span>
+        <span class="sr-only" data-i18n="newTab">opens in a new tab</span>
+      </a>
+
+    </div>
+  </footer>
+</div>
+
+<!-- Spoken confirmation for screen readers -->
+<div id="liveStatus" class="sr-only" role="status" aria-live="polite"></div>
+
+<!-- Language popup (native dialog: traps focus, closes with Escape) -->
+<dialog id="langDialog" aria-labelledby="langDialogTitle">
+  <h2 id="langDialogTitle" data-i18n="langDialogTitle">Choose language</h2>
+  <ul class="lang-list">
+    <li><button type="button" class="lang-option" data-lang="en" lang="en" dir="ltr" aria-pressed="false">English</button></li>
+    <li><button type="button" class="lang-option" data-lang="hi" lang="hi" dir="ltr" aria-pressed="false">हिन्दी</button></li>
+    <li><button type="button" class="lang-option" data-lang="ur" lang="ur" dir="rtl" aria-pressed="false">اردو</button></li>
+    <li><button type="button" class="lang-option" data-lang="pa" lang="pa" dir="ltr" aria-pressed="false">ਪੰਜਾਬੀ</button></li>
+  </ul>
+  <button type="button" id="langClose" class="close-button" data-i18n="close">Close</button>
+</dialog>
+
+<script>
+  /* ===== EDIT TEXT HERE: all visible words, in four languages ===== */
+  const TEXT = {
+    en: {
+      dir: "ltr",
+      pageTitle: "Welcome",
+      langButton: "Change language",
+      langDialogTitle: "Choose language",
+      close: "Close",
+      langChanged: "Language set to English.",
+      signInTitle: "Sign in",
+      signInText: "Enter your name and password.",
+      nameLabel: "Your name",
+      passwordLabel: "Password",
+      showPassword: "Show password",
+      signInBtn: "Sign in",
+      goCreate: "Create new account",
+      goForgot: "Forgot password?",
+      backToSignIn: "Back to sign in",
+      createTitle: "Create account",
+      createText: "Choose a name and a password. Accounts are saved on this phone only, and a phone can hold two.",
+      confirmLabel: "Repeat password",
+      createBtn: "Create account",
+      forgotTitle: "Reset password",
+      forgotText: "Enter your name, your recovery code and a new password.",
+      codeLabel: "Recovery code",
+      newPasswordLabel: "New password",
+      resetBtn: "Reset password",
+      codeTitle: "Your recovery code",
+      codeText: "Write this code somewhere safe. You need it if you forget your password. It will not be shown again.",
+      codeCopy: "Copy code",
+      codeCopied: "Code copied.",
+      codeSaved: "I saved my code, continue",
+      errName: "Please enter your name.",
+      errPassword: "Please enter your password.",
+      errShort: "Password must be at least 6 characters.",
+      errMismatch: "The two passwords do not match.",
+      errWrong: "Name or password is wrong.",
+      errExists: "This name is already used on this phone.",
+      errFull: "This phone already has two accounts.",
+      errBadCode: "Name or recovery code is wrong.",
+      errNoCrypto: "This browser cannot keep passwords safely. Please use an updated browser.",
+      resetDone: "Password changed. Please sign in.",
+      logout: "Sign out",
+      greetMorning: "Good morning, {name}",
+      greetAfternoon: "Good afternoon, {name}",
+      greetEvening: "Good evening, {name}",
+      greetNight: "Hello, {name}",
+      pleaseSignIn: "Please sign in first.",
+      pleaseCreate: "Please create an account first.",
+      homeText: "Welcome! New videos, apps and games are coming soon. Follow the channels below to hear first.",
+      contactHeading: "Contact and updates",
+      contactText: "Get new uploads first, or message directly.",
+      whatsappChannel: "WhatsApp Channel",
+      youtube: "YouTube Channel",
+      whatsappChat: "Chat on WhatsApp",
+      newTab: "opens in a new tab"
+    },
+    hi: {
+      dir: "ltr",
+      pageTitle: "स्वागत है",
+      langButton: "भाषा बदलें",
+      langDialogTitle: "भाषा चुनें",
+      close: "बंद करें",
+      langChanged: "भाषा हिन्दी हो गई।",
+      signInTitle: "साइन इन करें",
+      signInText: "अपना नाम और पासवर्ड लिखें।",
+      nameLabel: "आपका नाम",
+      passwordLabel: "पासवर्ड",
+      showPassword: "पासवर्ड दिखाएँ",
+      signInBtn: "साइन इन करें",
+      goCreate: "नया अकाउंट बनाएँ",
+      goForgot: "पासवर्ड भूल गए?",
+      backToSignIn: "साइन इन पर वापस जाएँ",
+      createTitle: "अकाउंट बनाएँ",
+      createText: "एक नाम और पासवर्ड चुनें। अकाउंट सिर्फ़ इसी फ़ोन में सेव होते हैं, और एक फ़ोन में दो अकाउंट बन सकते हैं।",
+      confirmLabel: "पासवर्ड दोबारा लिखें",
+      createBtn: "अकाउंट बनाएँ",
+      forgotTitle: "पासवर्ड रीसेट करें",
+      forgotText: "अपना नाम, रिकवरी कोड और नया पासवर्ड लिखें।",
+      codeLabel: "रिकवरी कोड",
+      newPasswordLabel: "नया पासवर्ड",
+      resetBtn: "पासवर्ड रीसेट करें",
+      codeTitle: "आपका रिकवरी कोड",
+      codeText: "इस कोड को कहीं सुरक्षित लिख लें। पासवर्ड भूलने पर यही काम आएगा। यह दोबारा नहीं दिखाया जाएगा।",
+      codeCopy: "कोड कॉपी करें",
+      codeCopied: "कोड कॉपी हो गया।",
+      codeSaved: "मैंने कोड सेव कर लिया, आगे बढ़ें",
+      errName: "कृपया अपना नाम लिखें।",
+      errPassword: "कृपया पासवर्ड लिखें।",
+      errShort: "पासवर्ड कम से कम 6 अक्षर का होना चाहिए।",
+      errMismatch: "दोनों पासवर्ड एक जैसे नहीं हैं।",
+      errWrong: "नाम या पासवर्ड गलत है।",
+      errExists: "यह नाम इस फ़ोन में पहले से है।",
+      errFull: "इस फ़ोन में पहले से दो अकाउंट हैं।",
+      errBadCode: "नाम या रिकवरी कोड गलत है।",
+      errNoCrypto: "यह ब्राउज़र पासवर्ड सुरक्षित नहीं रख सकता। कृपया नया ब्राउज़र इस्तेमाल करें।",
+      resetDone: "पासवर्ड बदल गया। अब साइन इन करें।",
+      logout: "साइन आउट करें",
+      greetMorning: "सुप्रभात, {name}",
+      greetAfternoon: "शुभ दोपहर, {name}",
+      greetEvening: "शुभ संध्या, {name}",
+      greetNight: "नमस्ते, {name}",
+      pleaseSignIn: "कृपया पहले साइन इन करें।",
+      pleaseCreate: "कृपया पहले अकाउंट बनाएँ।",
+      homeText: "स्वागत है! नए वीडियो, ऐप्स और गेम्स जल्द आ रहे हैं। सबसे पहले जानने के लिए नीचे दिए चैनल से जुड़ें।",
+      contactHeading: "संपर्क और अपडेट",
+      contactText: "नए अपलोड सबसे पहले पाएँ, या सीधे संदेश भेजें।",
+      whatsappChannel: "WhatsApp चैनल",
+      youtube: "YouTube चैनल",
+      whatsappChat: "WhatsApp पर चैट करें",
+      newTab: "नए टैब में खुलता है"
+    },
+    ur: {
+      dir: "rtl",
+      pageTitle: "خوش آمدید",
+      langButton: "زبان تبدیل کریں",
+      langDialogTitle: "زبان منتخب کریں",
+      close: "بند کریں",
+      langChanged: "زبان اردو ہو گئی۔",
+      signInTitle: "سائن ان کریں",
+      signInText: "اپنا نام اور پاس ورڈ لکھیں۔",
+      nameLabel: "آپ کا نام",
+      passwordLabel: "پاس ورڈ",
+      showPassword: "پاس ورڈ دکھائیں",
+      signInBtn: "سائن ان کریں",
+      goCreate: "نیا اکاؤنٹ بنائیں",
+      goForgot: "پاس ورڈ بھول گئے؟",
+      backToSignIn: "سائن ان پر واپس جائیں",
+      createTitle: "اکاؤنٹ بنائیں",
+      createText: "ایک نام اور پاس ورڈ منتخب کریں۔ اکاؤنٹ صرف اسی فون میں محفوظ ہوتے ہیں، اور ایک فون میں دو اکاؤنٹ بن سکتے ہیں۔",
+      confirmLabel: "پاس ورڈ دوبارہ لکھیں",
+      createBtn: "اکاؤنٹ بنائیں",
+      forgotTitle: "پاس ورڈ ری سیٹ کریں",
+      forgotText: "اپنا نام، ریکوری کوڈ اور نیا پاس ورڈ لکھیں۔",
+      codeLabel: "ریکوری کوڈ",
+      newPasswordLabel: "نیا پاس ورڈ",
+      resetBtn: "پاس ورڈ ری سیٹ کریں",
+      codeTitle: "آپ کا ریکوری کوڈ",
+      codeText: "اس کوڈ کو کہیں محفوظ لکھ لیں۔ پاس ورڈ بھولنے پر یہی کام آئے گا۔ یہ دوبارہ نہیں دکھایا جائے گا۔",
+      codeCopy: "کوڈ کاپی کریں",
+      codeCopied: "کوڈ کاپی ہو گیا۔",
+      codeSaved: "میں نے کوڈ محفوظ کر لیا، آگے بڑھیں",
+      errName: "براہ کرم اپنا نام لکھیں۔",
+      errPassword: "براہ کرم پاس ورڈ لکھیں۔",
+      errShort: "پاس ورڈ کم از کم 6 حروف کا ہونا چاہیے۔",
+      errMismatch: "دونوں پاس ورڈ ایک جیسے نہیں ہیں۔",
+      errWrong: "نام یا پاس ورڈ غلط ہے۔",
+      errExists: "یہ نام اس فون میں پہلے سے موجود ہے۔",
+      errFull: "اس فون میں پہلے سے دو اکاؤنٹ ہیں۔",
+      errBadCode: "نام یا ریکوری کوڈ غلط ہے۔",
+      errNoCrypto: "یہ براؤزر پاس ورڈ محفوظ نہیں رکھ سکتا۔ براہ کرم نیا براؤزر استعمال کریں۔",
+      resetDone: "پاس ورڈ بدل گیا۔ اب سائن ان کریں۔",
+      logout: "سائن آؤٹ کریں",
+      greetMorning: "صبح بخیر، {name}",
+      greetAfternoon: "دوپہر بخیر، {name}",
+      greetEvening: "شام بخیر، {name}",
+      greetNight: "السلام علیکم، {name}",
+      pleaseSignIn: "براہ کرم پہلے سائن ان کریں۔",
+      pleaseCreate: "براہ کرم پہلے اکاؤنٹ بنائیں۔",
+      homeText: "خوش آمدید! نئی ویڈیوز، ایپس اور گیمز جلد آ رہے ہیں۔ سب سے پہلے جاننے کے لیے نیچے دیے گئے چینلز سے جڑیں۔",
+      contactHeading: "رابطہ اور اپ ڈیٹس",
+      contactText: "نئی اپ لوڈز سب سے پہلے حاصل کریں، یا براہ راست پیغام بھیجیں۔",
+      whatsappChannel: "واٹس ایپ چینل",
+      youtube: "یوٹیوب چینل",
+      whatsappChat: "واٹس ایپ پر چیٹ کریں",
+      newTab: "نئے ٹیب میں کھلتا ہے"
+    },
+    pa: {
+      dir: "ltr",
+      pageTitle: "ਜੀ ਆਇਆਂ ਨੂੰ",
+      langButton: "ਭਾਸ਼ਾ ਬਦਲੋ",
+      langDialogTitle: "ਭਾਸ਼ਾ ਚੁਣੋ",
+      close: "ਬੰਦ ਕਰੋ",
+      langChanged: "ਭਾਸ਼ਾ ਪੰਜਾਬੀ ਹੋ ਗਈ।",
+      signInTitle: "ਸਾਈਨ ਇਨ ਕਰੋ",
+      signInText: "ਆਪਣਾ ਨਾਂ ਅਤੇ ਪਾਸਵਰਡ ਲਿਖੋ।",
+      nameLabel: "ਤੁਹਾਡਾ ਨਾਂ",
+      passwordLabel: "ਪਾਸਵਰਡ",
+      showPassword: "ਪਾਸਵਰਡ ਦਿਖਾਓ",
+      signInBtn: "ਸਾਈਨ ਇਨ ਕਰੋ",
+      goCreate: "ਨਵਾਂ ਅਕਾਊਂਟ ਬਣਾਓ",
+      goForgot: "ਪਾਸਵਰਡ ਭੁੱਲ ਗਏ?",
+      backToSignIn: "ਸਾਈਨ ਇਨ ਤੇ ਵਾਪਸ ਜਾਓ",
+      createTitle: "ਅਕਾਊਂਟ ਬਣਾਓ",
+      createText: "ਇੱਕ ਨਾਂ ਅਤੇ ਪਾਸਵਰਡ ਚੁਣੋ। ਅਕਾਊਂਟ ਸਿਰਫ਼ ਇਸੇ ਫ਼ੋਨ ਵਿੱਚ ਸੰਭਾਲੇ ਜਾਂਦੇ ਹਨ, ਅਤੇ ਇੱਕ ਫ਼ੋਨ ਵਿੱਚ ਦੋ ਅਕਾਊਂਟ ਬਣ ਸਕਦੇ ਹਨ।",
+      confirmLabel: "ਪਾਸਵਰਡ ਦੁਬਾਰਾ ਲਿਖੋ",
+      createBtn: "ਅਕਾਊਂਟ ਬਣਾਓ",
+      forgotTitle: "ਪਾਸਵਰਡ ਰੀਸੈੱਟ ਕਰੋ",
+      forgotText: "ਆਪਣਾ ਨਾਂ, ਰਿਕਵਰੀ ਕੋਡ ਅਤੇ ਨਵਾਂ ਪਾਸਵਰਡ ਲਿਖੋ।",
+      codeLabel: "ਰਿਕਵਰੀ ਕੋਡ",
+      newPasswordLabel: "ਨਵਾਂ ਪਾਸਵਰਡ",
+      resetBtn: "ਪਾਸਵਰਡ ਰੀਸੈੱਟ ਕਰੋ",
+      codeTitle: "ਤੁਹਾਡਾ ਰਿਕਵਰੀ ਕੋਡ",
+      codeText: "ਇਸ ਕੋਡ ਨੂੰ ਕਿਤੇ ਸੁਰੱਖਿਅਤ ਲਿਖ ਲਓ। ਪਾਸਵਰਡ ਭੁੱਲਣ ਤੇ ਇਹੀ ਕੰਮ ਆਵੇਗਾ। ਇਹ ਦੁਬਾਰਾ ਨਹੀਂ ਦਿਖਾਇਆ ਜਾਵੇਗਾ।",
+      codeCopy: "ਕੋਡ ਕਾਪੀ ਕਰੋ",
+      codeCopied: "ਕੋਡ ਕਾਪੀ ਹੋ ਗਿਆ।",
+      codeSaved: "ਮੈਂ ਕੋਡ ਸੰਭਾਲ ਲਿਆ, ਅੱਗੇ ਵਧੋ",
+      errName: "ਕਿਰਪਾ ਕਰਕੇ ਆਪਣਾ ਨਾਂ ਲਿਖੋ।",
+      errPassword: "ਕਿਰਪਾ ਕਰਕੇ ਪਾਸਵਰਡ ਲਿਖੋ।",
+      errShort: "ਪਾਸਵਰਡ ਘੱਟੋ-ਘੱਟ 6 ਅੱਖਰਾਂ ਦਾ ਹੋਣਾ ਚਾਹੀਦਾ ਹੈ।",
+      errMismatch: "ਦੋਵੇਂ ਪਾਸਵਰਡ ਇੱਕੋ ਜਿਹੇ ਨਹੀਂ ਹਨ।",
+      errWrong: "ਨਾਂ ਜਾਂ ਪਾਸਵਰਡ ਗ਼ਲਤ ਹੈ।",
+      errExists: "ਇਹ ਨਾਂ ਇਸ ਫ਼ੋਨ ਵਿੱਚ ਪਹਿਲਾਂ ਹੀ ਹੈ।",
+      errFull: "ਇਸ ਫ਼ੋਨ ਵਿੱਚ ਪਹਿਲਾਂ ਹੀ ਦੋ ਅਕਾਊਂਟ ਹਨ।",
+      errBadCode: "ਨਾਂ ਜਾਂ ਰਿਕਵਰੀ ਕੋਡ ਗ਼ਲਤ ਹੈ।",
+      errNoCrypto: "ਇਹ ਬ੍ਰਾਊਜ਼ਰ ਪਾਸਵਰਡ ਸੁਰੱਖਿਅਤ ਨਹੀਂ ਰੱਖ ਸਕਦਾ। ਕਿਰਪਾ ਕਰਕੇ ਨਵਾਂ ਬ੍ਰਾਊਜ਼ਰ ਵਰਤੋ।",
+      resetDone: "ਪਾਸਵਰਡ ਬਦਲ ਗਿਆ। ਹੁਣ ਸਾਈਨ ਇਨ ਕਰੋ।",
+      logout: "ਸਾਈਨ ਆਊਟ ਕਰੋ",
+      greetMorning: "ਸ਼ੁਭ ਸਵੇਰ, {name}",
+      greetAfternoon: "ਸ਼ੁਭ ਦੁਪਹਿਰ, {name}",
+      greetEvening: "ਸ਼ੁਭ ਸ਼ਾਮ, {name}",
+      greetNight: "ਸਤ ਸ੍ਰੀ ਅਕਾਲ, {name}",
+      pleaseSignIn: "ਕਿਰਪਾ ਕਰਕੇ ਪਹਿਲਾਂ ਸਾਈਨ ਇਨ ਕਰੋ।",
+      pleaseCreate: "ਕਿਰਪਾ ਕਰਕੇ ਪਹਿਲਾਂ ਅਕਾਊਂਟ ਬਣਾਓ।",
+      homeText: "ਜੀ ਆਇਆਂ ਨੂੰ! ਨਵੇਂ ਵੀਡੀਓ, ਐਪਸ ਅਤੇ ਗੇਮਾਂ ਜਲਦੀ ਆ ਰਹੇ ਹਨ। ਸਭ ਤੋਂ ਪਹਿਲਾਂ ਜਾਣਨ ਲਈ ਹੇਠਾਂ ਦਿੱਤੇ ਚੈਨਲਾਂ ਨਾਲ ਜੁੜੋ।",
+      contactHeading: "ਸੰਪਰਕ ਅਤੇ ਅੱਪਡੇਟ",
+      contactText: "ਨਵੇਂ ਅੱਪਲੋਡ ਸਭ ਤੋਂ ਪਹਿਲਾਂ ਪਾਓ, ਜਾਂ ਸਿੱਧਾ ਸੁਨੇਹਾ ਭੇਜੋ।",
+      whatsappChannel: "WhatsApp ਚੈਨਲ",
+      youtube: "YouTube ਚੈਨਲ",
+      whatsappChat: "WhatsApp ਤੇ ਚੈਟ ਕਰੋ",
+      newTab: "ਨਵੇਂ ਟੈਬ ਵਿੱਚ ਖੁੱਲ੍ਹਦਾ ਹੈ"
+    }
+  };
+
+  /* ===== SETTINGS ===== */
+  const MAX_ACCOUNTS = 2;          /* accounts one phone can hold */
+  const MIN_PASSWORD = 6;          /* shortest allowed password */
+  const LANG_KEY = "siteLanguage";
+  const ACCOUNTS_KEY = "siteAccounts";
+  const SESSION_KEY = "siteSession";
+
+  const $ = function (id) { return document.getElementById(id); };
+  const VIEWS = ["viewSignIn", "viewCreate", "viewCode", "viewForgot", "viewHome"];
+  const options = document.querySelectorAll(".lang-option");
+  const dialog = $("langDialog");
+  const live = $("liveStatus");
+
+  let currentLang = "en";
+  let userName = "";
+  let pendingName = "";
+  let pendingCode = "";
+
+  /* ---------- Storage helpers ---------- */
+  function readStore(key) {
+    try { return localStorage.getItem(key) || ""; } catch (e) { return ""; }
+  }
+  function writeStore(key, value) {
+    try { localStorage.setItem(key, value); } catch (e) { /* ignore */ }
+  }
+  function removeStore(key) {
+    try { localStorage.removeItem(key); } catch (e) { /* ignore */ }
+  }
+  function getAccounts() {
+    try {
+      const list = JSON.parse(readStore(ACCOUNTS_KEY) || "[]");
+      return Array.isArray(list) ? list : [];
+    } catch (e) { return []; }
+  }
+  function saveAccounts(list) { writeStore(ACCOUNTS_KEY, JSON.stringify(list)); }
+
+  function cleanName(s) { return s.replace(/\s+/g, " ").trim(); }
+  function findAccount(name) {
+    const key = cleanName(name).toLowerCase();
+    return getAccounts().find(function (a) { return a.name.toLowerCase() === key; });
+  }
+
+  /* ---------- Password scrambling (PBKDF2, runs only on this phone) ---------- */
+  const hasCrypto = !!(window.crypto && window.crypto.subtle);
+
+  function toB64(bytes) { return btoa(String.fromCharCode.apply(null, bytes)); }
+  function fromB64(text) { return Uint8Array.from(atob(text), function (c) { return c.charCodeAt(0); }); }
+  function newSalt() { return toB64(crypto.getRandomValues(new Uint8Array(16))); }
+
+  async function derive(secret, saltB64) {
+    const material = await crypto.subtle.importKey(
+      "raw", new TextEncoder().encode(secret), "PBKDF2", false, ["deriveBits"]);
+    const bits = await crypto.subtle.deriveBits(
+      { name: "PBKDF2", salt: fromB64(saltB64), iterations: 100000, hash: "SHA-256" },
+      material, 256);
+    return toB64(new Uint8Array(bits));
+  }
+
+  function normalizeCode(s) { return s.toUpperCase().replace(/[^A-Z0-9]/g, ""); }
+
+  function makeCode() {
+    const alphabet = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";   /* 32 letters and digits, no look-alikes */
+    const bytes = crypto.getRandomValues(new Uint8Array(8));
+    let out = "";
+    bytes.forEach(function (b) { out += alphabet[b % 32]; });
+    return out;
+  }
+
+  /* ---------- Messages that follow the chosen language ---------- */
+  function setMsg(el, key) {
+    el.dataset.key = key || "";
+    el.textContent = key ? TEXT[currentLang][key] : "";
+  }
+
+  /* ---------- Views ---------- */
+  function refreshButtons() {
+    const count = getAccounts().length;
+    const full = count >= MAX_ACCOUNTS;
+    $("goCreate").hidden = full;
+    $("fullNote").hidden = !full;
+    $("goForgot").hidden = count === 0;
+    $("backFromCreate").hidden = count === 0;
+  }
+
+  function show(id, focusHeading) {
+    renderGuestGreeting();
+    VIEWS.forEach(function (v) { $(v).hidden = v !== id; });
+    ["siError", "crError", "fgError"].forEach(function (e) { setMsg($(e), ""); });
+    if (id !== "viewSignIn") setMsg($("signInNotice"), "");
+    refreshButtons();
+    if (focusHeading) $(id).querySelector("h1").focus();
+  }
+
+  /* Picks the greeting from the phone's own clock:
+     5-11 morning, 12-16 afternoon, 17-21 evening, otherwise late night */
+  function greetingKey() {
+    const hour = new Date().getHours();
+    if (hour >= 5 && hour < 12) return "greetMorning";
+    if (hour >= 12 && hour < 17) return "greetAfternoon";
+    if (hour >= 17 && hour < 22) return "greetEvening";
+    return "greetNight";
+  }
+
+  /* Greeting for visitors who are not signed in: time of day, no name */
+  function renderGuestGreeting() {
+    const t = TEXT[currentLang];
+    const hello = t[greetingKey()].replace(/[,،]\s*\{name\}/, "") + "! ";
+    $("guestSignIn").textContent = hello + t.pleaseSignIn;
+    $("guestCreate").textContent = hello + t.pleaseCreate;
+  }
+
+  function renderGreeting() {
+    $("homeTitle").textContent = TEXT[currentLang][greetingKey()].replace("{name}", userName);
+  }
+
+  function clearFields() {
+    ["siName", "siPass", "crName", "crPass", "crPass2", "fgName", "fgCode", "fgPass"].forEach(function (id) {
+      $(id).value = "";
+    });
+    document.querySelectorAll("[data-toggle]").forEach(function (box) {
+      box.checked = false;
+      box.dispatchEvent(new Event("change"));
+    });
+  }
+
+  function signedIn(name) {
+    userName = name;
+    writeStore(SESSION_KEY, name);
+    clearFields();
+    renderGreeting();
+    show("viewHome", true);
+  }
+
+  /* ---------- Language ---------- */
+  function applyLang(code, announce) {
+    const t = TEXT[code];
+    currentLang = code;
+    document.documentElement.lang = code;
+    document.documentElement.dir = t.dir;   /* rtl for Urdu */
+    document.title = t.pageTitle;
+
+    document.querySelectorAll("[data-i18n]").forEach(function (el) {
+      const key = el.getAttribute("data-i18n");
+      if (t[key]) el.textContent = t[key];
+    });
+    document.querySelectorAll("[data-key]").forEach(function (el) {
+      if (el.dataset.key) el.textContent = t[el.dataset.key];
+    });
+    options.forEach(function (btn) {
+      btn.setAttribute("aria-pressed", btn.dataset.lang === code ? "true" : "false");
+    });
+    if (userName) renderGreeting();
+    renderGuestGreeting();
+
+    if (announce) {
+      live.textContent = "";
+      setTimeout(function () { live.textContent = t.langChanged; }, 100);
+    }
+  }
+
+  $("langBtn").addEventListener("click", function () {
+    if (typeof dialog.showModal === "function") dialog.showModal();
+  });
+  $("langClose").addEventListener("click", function () { dialog.close(); });
+  dialog.addEventListener("click", function (e) { if (e.target === dialog) dialog.close(); });
+  options.forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      writeStore(LANG_KEY, btn.dataset.lang);
+      applyLang(btn.dataset.lang, true);
+      dialog.close();
+    });
+  });
+
+  /* ---------- Show password checkboxes ---------- */
+  document.querySelectorAll("[data-toggle]").forEach(function (box) {
+    box.addEventListener("change", function () {
+      box.dataset.toggle.split(",").forEach(function (id) {
+        $(id).type = box.checked ? "text" : "password";
+      });
+    });
+  });
+
+  /* ---------- Navigation buttons ---------- */
+  $("goCreate").addEventListener("click", function () { show("viewCreate", true); });
+  $("goForgot").addEventListener("click", function () { show("viewForgot", true); });
+  $("backFromCreate").addEventListener("click", function () { show("viewSignIn", true); });
+  $("backFromForgot").addEventListener("click", function () { show("viewSignIn", true); });
+  $("logout").addEventListener("click", function () {
+    userName = "";
+    removeStore(SESSION_KEY);
+    show("viewSignIn", true);
+  });
+
+  /* ---------- Sign in ---------- */
+  $("signInForm").addEventListener("submit", async function (e) {
+    e.preventDefault();
+    const err = $("siError");
+    const name = cleanName($("siName").value);
+    const pass = $("siPass").value;
+    if (!name) { setMsg(err, "errName"); $("siName").focus(); return; }
+    if (!pass) { setMsg(err, "errPassword"); $("siPass").focus(); return; }
+    if (!hasCrypto) { setMsg(err, "errNoCrypto"); return; }
+    const acc = findAccount(name);
+    if (!acc) { setMsg(err, "errWrong"); return; }
+    try {
+      const h = await derive(pass, acc.salt);
+      if (h !== acc.hash) { setMsg(err, "errWrong"); return; }
+      signedIn(acc.name);
+    } catch (ex) { setMsg(err, "errNoCrypto"); }
+  });
+
+  /* ---------- Create account ---------- */
+  $("createForm").addEventListener("submit", async function (e) {
+    e.preventDefault();
+    const err = $("crError");
+    const name = cleanName($("crName").value);
+    const pass = $("crPass").value;
+    const pass2 = $("crPass2").value;
+    if (!name) { setMsg(err, "errName"); $("crName").focus(); return; }
+    if (pass.length < MIN_PASSWORD) { setMsg(err, "errShort"); $("crPass").focus(); return; }
+    if (pass !== pass2) { setMsg(err, "errMismatch"); $("crPass2").focus(); return; }
+    if (!hasCrypto) { setMsg(err, "errNoCrypto"); return; }
+    const accounts = getAccounts();
+    if (accounts.length >= MAX_ACCOUNTS) { setMsg(err, "errFull"); return; }
+    if (findAccount(name)) { setMsg(err, "errExists"); $("crName").focus(); return; }
+    try {
+      const code = makeCode();
+      const salt = newSalt();
+      const recSalt = newSalt();
+      accounts.push({
+        name: name,
+        salt: salt,
+        hash: await derive(pass, salt),
+        recSalt: recSalt,
+        recHash: await derive(code, recSalt)
+      });
+      saveAccounts(accounts);
+      pendingName = name;
+      pendingCode = code;
+      const half1 = code.slice(0, 4).split("").join(" ");
+      const half2 = code.slice(4).split("").join(" ");
+      $("codeValue").textContent = half1 + "  -  " + half2;
+      clearFields();
+      show("viewCode", true);
+    } catch (ex) { setMsg(err, "errNoCrypto"); }
+  });
+
+  $("copyCode").addEventListener("click", async function () {
+    const plain = pendingCode.slice(0, 4) + "-" + pendingCode.slice(4);
+    try {
+      await navigator.clipboard.writeText(plain);
+      live.textContent = "";
+      setTimeout(function () { live.textContent = TEXT[currentLang].codeCopied; }, 100);
+    } catch (ex) { /* clipboard blocked: the code is still on screen */ }
+  });
+
+  $("codeSaved").addEventListener("click", function () {
+    const name = pendingName;
+    pendingName = "";
+    pendingCode = "";
+    $("codeValue").textContent = "";
+    signedIn(name);
+  });
+
+  /* ---------- Forgot password ---------- */
+  $("forgotForm").addEventListener("submit", async function (e) {
+    e.preventDefault();
+    const err = $("fgError");
+    const name = cleanName($("fgName").value);
+    const code = normalizeCode($("fgCode").value);
+    const pass = $("fgPass").value;
+    if (!name) { setMsg(err, "errName"); $("fgName").focus(); return; }
+    if (!code) { setMsg(err, "errBadCode"); $("fgCode").focus(); return; }
+    if (pass.length < MIN_PASSWORD) { setMsg(err, "errShort"); $("fgPass").focus(); return; }
+    if (!hasCrypto) { setMsg(err, "errNoCrypto"); return; }
+    const accounts = getAccounts();
+    const key = name.toLowerCase();
+    const acc = accounts.find(function (a) { return a.name.toLowerCase() === key; });
+    if (!acc) { setMsg(err, "errBadCode"); return; }
+    try {
+      const h = await derive(code, acc.recSalt);
+      if (h !== acc.recHash) { setMsg(err, "errBadCode"); return; }
+      acc.salt = newSalt();
+      acc.hash = await derive(pass, acc.salt);
+      saveAccounts(accounts);
+      clearFields();
+      show("viewSignIn", false);
+      setMsg($("signInNotice"), "resetDone");
+      $("signInNotice").focus();
+    } catch (ex) { setMsg(err, "errNoCrypto"); }
+  });
+
+  /* ---------- Start ---------- */
+  applyLang(TEXT[readStore(LANG_KEY)] ? readStore(LANG_KEY) : "en", false);
+  (function start() {
+    const saved = readStore(SESSION_KEY);
+    const acc = saved ? findAccount(saved) : null;
+    if (acc) {
+      userName = acc.name;
+      renderGreeting();
+      show("viewHome", false);
+    } else {
+      removeStore(SESSION_KEY);
+      show(getAccounts().length ? "viewSignIn" : "viewCreate", false);
+    }
+  })();
+</script>
+</body>
+</html>
